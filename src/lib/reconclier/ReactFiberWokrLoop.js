@@ -1,3 +1,4 @@
+import beginWork from './ReactFiberBeginWork';
 
 // 保存当前使用的根节点
 let workInProgress = null;
@@ -41,6 +42,7 @@ function workLoop(deadline) {
 function performUnitOfWork() {
     // 生成子 fiber
     beginWork(workInProgress);
+    
 
     if (workInProgress.child !== null) {
         workInProgress = workInProgress.child;
@@ -48,6 +50,7 @@ function performUnitOfWork() {
     }
     // 没有子节点，则进行提交副作用
     completeWork(workInProgress);
+    
 
     // 如果没有子节点，找兄弟节点
     const next = workInProgress;
