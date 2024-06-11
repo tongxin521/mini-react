@@ -18,7 +18,6 @@ export function updateHostComponent(workInProgress) {
         // 应该处理子节点
         reconcileChildren(workInProgress, workInProgress.props.children)
 
-        console.log(workInProgress)
     }
 
 }
