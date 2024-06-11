@@ -10,7 +10,8 @@ import {
 import {
     updateHostTextComponent,
     updateHostComponent,
-    updateFunctionComponent
+    updateFunctionComponent,
+    updateClassComponent,
 } from './ReactFiberReconclier';
 
 /**
@@ -22,6 +23,7 @@ export default function berginWork(workInProgress) {
 
     switch (tag) {
         case ClassComponent:
+            updateClassComponent(workInProgress)
             break;
         case FunctionComponent:
             updateFunctionComponent(workInProgress);

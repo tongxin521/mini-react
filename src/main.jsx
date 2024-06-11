@@ -1,9 +1,12 @@
 import ReactDOM from './lib/react-dom/ReactDom'
-import App from './App.jsx'
+// import AppFunction from './AppFunction.jsx'
+import AppClass from './AppClass.jsx'
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
-root.render(<App />)
+// root.render(<AppFunction />)
+
+root.render(<AppClass />)
 
 // root.render(11111);
 

@@ -81,7 +81,6 @@ export function updateNode(node, preValue, nextValue) {
     }
   })
 
-  console.log(node, preValue, nextValue);
   Object.keys(nextValue).forEach((key) => {
     if (key === 'children') {
       // 文本节点

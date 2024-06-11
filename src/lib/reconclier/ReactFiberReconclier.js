@@ -22,12 +22,30 @@ export function updateHostComponent(workInProgress) {
 
 }
 
-
+/**
+ * 函数组件
+ * @param {*} workInProgress 
+ */
 export function updateFunctionComponent(workInProgress) {
-    // 从当前的 wip 上面获取到的 type 是一个函数
+    // 从当前的 workInProgress 上面获取到的 type 是一个函数
     // 函数执行获取 VNode
     const {type, props} = workInProgress;
     const children = type(props)
     // 调用 reconcileChildren 方法，来处理子节点
     reconcileChildren(workInProgress, children);
+}
+
+/**
+ * 类组件
+ * @param {*} workInProgress 
+ */
+export function updateClassComponent(workInProgress) {
+    // 当前的 workInProgress 上面获取到的 type 是一个类
+    // 创建组件实例
+    const {type, props} = workInProgress;
+    const instance = new type(props);
+    // 调用组件的 render 方法，获取 VNode
+    const children = instance.render();
+    reconcileChildren(workInProgress, children);
+
 }

@@ -1,5 +1,5 @@
 // eslint-disable-next-line react/prop-types
-function App({id}) {
+function AppFunction({id}) {
   return (
     <div className="container" id={id}>
       <div className="one">
@@ -17,4 +17,4 @@ function App({id}) {
   );
 }
 
-export default App;
+export default AppFunction;
