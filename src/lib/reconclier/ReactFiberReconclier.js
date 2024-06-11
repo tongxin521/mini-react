@@ -1,4 +1,5 @@
 import {updateNode} from './../shared/util'
+import {reconcileChildren} from './ReactChildFiber';
 
 export function updateHostTextComponent(workInProgress) {
     workInProgress.stateNode = document.createTextNode(workInProgress.props.children)
@@ -7,12 +8,17 @@ export function updateHostTextComponent(workInProgress) {
 
 
 export function updateHostComponent(workInProgress) {
-
+    //  创建真实的 DOM 节点对象
     if (!workInProgress.stateNode) {
+        // 进入此 if，说明当前的 fiber 节点没有创建过真实的 DOM 节点
         workInProgress.stateNode = document.createElement(workInProgress.type)
-        console.log(workInProgress.stateNode, "更新属性前");
+        // 更新节点上的属性
         updateNode(workInProgress.stateNode, {}, workInProgress.props)
-        console.log(workInProgress.stateNode, "更新属性后");
+
+        // 应该处理子节点
+        reconcileChildren(workInProgress, workInProgress.props.children)
+
+        console.log(workInProgress)
     }
 
 }

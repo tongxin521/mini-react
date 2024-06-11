@@ -40,6 +40,10 @@ export function isUndefined(s) {
   return s === undefined;
 }
 
+export function isArray(arr) {
+  return Array.isArray(arr);
+}
+
 /**
  * 该方法主要负责更新 DOM 节点上的属性
  * @param {*} node 真实的 DOM 节点
