@@ -1,4 +1,7 @@
 import beginWork from './ReactFiberBeginWork';
+import completeWork from './ReactFiberCompleteWork';
+import commitWorker from './ReactFiberCommitWork';
+
 
 // 保存当前使用的根节点
 let workInProgress = null;
@@ -42,9 +45,8 @@ function workLoop(deadline) {
 function performUnitOfWork() {
     // 生成子 fiber
     beginWork(workInProgress);
-    
 
-    if (workInProgress.child !== null) {
+    if (workInProgress.child) {
         workInProgress = workInProgress.child;
         return;
     }
@@ -53,10 +55,10 @@ function performUnitOfWork() {
     
 
     // 如果没有子节点，找兄弟节点
-    const next = workInProgress;
+    let next = workInProgress;
     
-    while (next != null) {
-        if (next.sibling !== null) {
+    while (next) {
+        if (next.sibling) {
             workInProgress = next.sibling;
             return;
         }
@@ -64,7 +66,7 @@ function performUnitOfWork() {
         // 如果没有进入上面 if 语句，说明当前节点没有兄弟节点了
         // 说明当前节点已经处理完了，需要返回到父节点
 
-        workInProgress = next.return;
+        next = next.return;
 
         // 在寻找父亲那一辈的兄弟节点之前，先执行一下 completeWork 方法
         completeWork(next);
@@ -74,7 +76,11 @@ function performUnitOfWork() {
 
     workInProgress = null;
 }
-
+/**
+ * 执行该方法的时候，说明整个节点的协调工作已经完成
+ * 接下来就进入到渲染阶段
+ */
 function commitRoot() {
-    
+    commitWorker(workInProgressRoot)
+    workInProgressRoot = null;
 }

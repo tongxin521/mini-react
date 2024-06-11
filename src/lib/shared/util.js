@@ -81,11 +81,11 @@ export function updateNode(node, preValue, nextValue) {
     }
   })
 
-
+  console.log(node, preValue, nextValue);
   Object.keys(nextValue).forEach((key) => {
     if (key === 'children') {
       // 文本节点
-      if (isStr(preValue[key])) {
+      if (isStr(nextValue[key])) {
         node.textContent = nextValue[key];
       } 
     }else if (key.startsWith('on')) {
