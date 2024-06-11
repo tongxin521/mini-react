@@ -7,7 +7,11 @@ import {
     Fragment,
   } from "./ReactWorkTag";
 
-import {updateHostTextComponent, updateHostComponent} from './ReactFiberReconclier';
+import {
+    updateHostTextComponent,
+    updateHostComponent,
+    updateFunctionComponent
+} from './ReactFiberReconclier';
 
 /**
  * 根据 fiber 不同的 tag 值，调用不同的方法来处理
@@ -20,6 +24,7 @@ export default function berginWork(workInProgress) {
         case ClassComponent:
             break;
         case FunctionComponent:
+            updateFunctionComponent(workInProgress);
             break;
         case HostText:
             updateHostTextComponent(workInProgress)

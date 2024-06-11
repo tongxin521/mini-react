@@ -1,6 +1,7 @@
-function App() {
+// eslint-disable-next-line react/prop-types
+function App({id}) {
   return (
-    <div className="container">
+    <div className="container" id={id}>
       <div className="one">
         <div className="two">
           <p>1</p>

@@ -21,3 +21,13 @@ export function updateHostComponent(workInProgress) {
     }
 
 }
+
+
+export function updateFunctionComponent(workInProgress) {
+    // 从当前的 wip 上面获取到的 type 是一个函数
+    // 函数执行获取 VNode
+    const {type, props} = workInProgress;
+    const children = type(props)
+    // 调用 reconcileChildren 方法，来处理子节点
+    reconcileChildren(workInProgress, children);
+}
