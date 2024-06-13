@@ -1,6 +1,7 @@
 import beginWork from './ReactFiberBeginWork';
 import completeWork from './ReactFiberCompleteWork';
 import commitWorker from './ReactFiberCommitWork';
+import schedulerCallback from './../scheduler/scheduler';
 
 
 // 保存当前使用的根节点
@@ -14,12 +15,34 @@ export default function scheduleUpdateOnFiber(fiber) {
     workInProgressRoot = fiber;
     // 暂时使用 requestIdleCallback 调度，后期使用 scheduler 包来进行调度
     // 当浏览器的每一帧有空闲时间的时候，执行 workloop 函数
-    requestIdleCallback(workLoop);
+    // requestIdleCallback(workLoop);
+    schedulerCallback(workLoop)
 
 }
 
-function workLoop(deadline) {
-    while (workInProgress && deadline.timeRemaining() > 0) {
+// function workLoop(deadline) {
+//     while (workInProgress && deadline.timeRemaining() > 0) {
+//         // 进入此循环，说明当前帧还有时间，并且有需要处理的 任务
+//         performUnitOfWork();
+//     }
+
+//     /**
+//      * 代码执行到这里，说明有两种情况
+//      * 1. 当前帧没有时间了，不需要处理
+//      * 2. fiber 树都处理完了，我们需要将 workInProgressRoot 挂载到 Dom 上
+//      */
+//     if (!workInProgress) {
+//         commitRoot();
+//     }
+// }
+
+
+function workLoop(timer) {
+    while (workInProgress) {
+
+        if (timer < 0) {
+            return false;
+        } 
         // 进入此循环，说明当前帧还有时间，并且有需要处理的 任务
         performUnitOfWork();
     }
@@ -29,7 +52,7 @@ function workLoop(deadline) {
      * 1. 当前帧没有时间了，不需要处理
      * 2. fiber 树都处理完了，我们需要将 workInProgressRoot 挂载到 Dom 上
      */
-    if (!workInProgress) {
+    if (!workInProgress && workInProgressRoot) {
         commitRoot();
     }
 }
