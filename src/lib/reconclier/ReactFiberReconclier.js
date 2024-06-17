@@ -1,5 +1,6 @@
 import {updateNode} from './../shared/util'
 import {reconcileChildren} from './ReactChildFiber';
+import {renderWithHooks} from './../react/ReactHooks';
 
 export function updateHostTextComponent(workInProgress) {
     workInProgress.stateNode = document.createTextNode(workInProgress.props.children)
@@ -14,12 +15,9 @@ export function updateHostComponent(workInProgress) {
         workInProgress.stateNode = document.createElement(workInProgress.type)
         // 更新节点上的属性
         updateNode(workInProgress.stateNode, {}, workInProgress.props)
-
-        // 应该处理子节点
-        reconcileChildren(workInProgress, workInProgress.props.children)
-
     }
-
+    // 应该处理子节点
+    reconcileChildren(workInProgress, workInProgress.props.children)
 }
 
 /**
@@ -28,6 +26,8 @@ export function updateHostComponent(workInProgress) {
  */
 export function updateFunctionComponent(workInProgress) {
     // 从当前的 workInProgress 上面获取到的 type 是一个函数
+    // 处理hooks
+    renderWithHooks(workInProgress);
     // 函数执行获取 VNode
     const {type, props} = workInProgress;
     const children = type(props)

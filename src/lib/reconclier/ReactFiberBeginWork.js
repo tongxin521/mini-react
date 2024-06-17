@@ -18,7 +18,7 @@ import {
  * 根据 fiber 不同的 tag 值，调用不同的方法来处理
  * @param {*} workInProgress
  */
-export default function berginWork(workInProgress) {
+export default function beginWork(workInProgress) {
     const tag = workInProgress.tag;
 
     switch (tag) {

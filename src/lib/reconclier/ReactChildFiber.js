@@ -1,4 +1,4 @@
-import { isStr, isArray, Update } from "../shared/util";
+import { isStrOrNumber, isArray, Update } from "../shared/util";
 import createFiber from "./ReactFiber";
 import {
     sameNode, placeChild,
@@ -9,7 +9,7 @@ import {
 export function reconcileChildren(returnFiber, children) {
     // 如果 children 是一个字符串，那么说明这是一个文本节点
     // 文本节点我们已经在 updateNode 方法中处理过了，所以这里就不需要再处理了
-    if (isStr(children)){
+    if (isStrOrNumber(children)){
         return
     }
 
@@ -51,7 +51,7 @@ export function reconcileChildren(returnFiber, children) {
         // 当前的 VNode 对象
         const newChild = newChildren[i];
 
-        if (!newChild) {
+        if (newChild === null) {
             continue;
         }
 
@@ -73,8 +73,11 @@ export function reconcileChildren(returnFiber, children) {
 
         if (!same) {
             // 说明不能复用，跳出循环
+            // 在退出第一轮遍历之前，我们会做一些额外的工作
             // 我们需要将 oldFiber 原本的值还原，方便后面使用
-            oldFiber = nextOldFiber;
+            if (oldFiber === null) {
+              oldFiber = nextOldFiber;
+            }
             break;
         }
 
@@ -129,7 +132,7 @@ export function reconcileChildren(returnFiber, children) {
             const newChildVnode = newChildren[i];
 
             if (newChildVnode == null) {
-                return;
+                continue;
             }
 
             const newFiber = createFiber(newChildVnode, returnFiber);
@@ -150,61 +153,55 @@ export function reconcileChildren(returnFiber, children) {
 
             previousFiber = newFiber;
         }
-
-        // 处理新旧节点都还有剩余的情况
-        // 首先创建一个 map 结构，用于存储剩余的旧节点
-
-        const existingChildren = mapRemainingChildren(oldFiber);
-
-        for (; i < newChildren.length; i++) {
-            const newChild = newChildren[i];
-
-            if (newChild == null) {
-                return;
-            }
-
-            // 根据新节点的 vnode 去生成新的 fiber
-            const newFiber = createFiber(newChild, returnFiber);
-
-            // 接下来就需要去哈希表里面寻找是否有可以复用的节点
-            const matchedFiber = existingChildren.get(newFiber.key || newFiber.index);
-
-            if (matchedFiber) {
-                // 说明可以复用
-                Object.assign(newFiber, {
-                    stateNode: matchedFiber.stateNode,
-                    alternate: matchedFiber,
-                    flags: Update,
-                });
-
-                // 更新 lastPlacedIndex 的值
-                lastplacedIndex = placeChild(
-                    newFiber,
-                    lastplacedIndex,
-                    i,
-                    shouldTrackSideEffects
-                );
-
-                // 将新生成的 fiber 加入到 fiber 链表里面去
-                if (previousFiber === null) {
-                    // 说明是第一个子节点
-                    returnFiber.child = newFiber;
-                } else {
-                    // 当前生成的 fiber 节点并非父 fiber 的第一个节点
-                    previousFiber.sibling = newFiber;
-                }
-                // 将 previousFiber 设置为 newFiber
-                previousFiber = newFiber;
-
-                // 整个新节点遍历完成后，如果 map 中还有剩余的旧节点，这些旧节点也就没有用了，直接删除即可
-                if (shouldTrackSideEffects) {
-                    existingChildren.forEach((child) => {
-                        deleteRemainingChildren(returnFiber, child);
-                    });
-                }
-            }
-        }
         
+    }
+
+    // 处理新旧节点都还有剩余的情况
+    // 首先创建一个 map 结构，用于存储剩余的旧节点
+    const existingChildren = mapRemainingChildren(oldFiber);
+    for (; i < newChildren.length; i++) {
+        const newChild = newChildren[i];
+        if (newChild === null) {
+            continue;
+        }
+        // 根据新节点的 vnode 去生成新的 fiber
+        const newFiber = createFiber(newChild, returnFiber);
+        // 接下来就需要去哈希表里面寻找是否有可以复用的节点
+        const matchedFiber = existingChildren.get(newFiber.key || newFiber.index);
+        if (matchedFiber) {
+            // 说明可以复用
+            Object.assign(newFiber, {
+                stateNode: matchedFiber.stateNode,
+                alternate: matchedFiber,
+                flags: Update,
+            });
+
+            // 删除哈希表中的旧 fiber
+            existingChildren.delete(newFiber.key || newFiber.index);
+        }
+        // 更新 lastPlacedIndex 的值
+        lastplacedIndex = placeChild(
+            newFiber,
+            lastplacedIndex,
+            i,
+            shouldTrackSideEffects
+        );
+        // 将新生成的 fiber 加入到 fiber 链表里面去
+        if (previousFiber === null) {
+            // 说明是第一个子节点
+            returnFiber.child = newFiber;
+        } else {
+            // 当前生成的 fiber 节点并非父 fiber 的第一个节点
+            previousFiber.sibling = newFiber;
+        }
+        // 将 previousFiber 设置为 newFiber
+        previousFiber = newFiber;
+        // 整个新节点遍历完成后，如果 map 中还有剩余的旧节点，这些旧节点也就没有用了，直接删除即可
+        if (shouldTrackSideEffects) {
+            existingChildren.forEach((child) => {
+                deleteRemainingChildren(returnFiber, child);
+            });
+        }
     }
 
 }

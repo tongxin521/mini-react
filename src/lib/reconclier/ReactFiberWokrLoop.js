@@ -104,6 +104,7 @@ function performUnitOfWork() {
  * 接下来就进入到渲染阶段
  */
 function commitRoot() {
+    
     commitWorker(workInProgressRoot)
     workInProgressRoot = null;
 }

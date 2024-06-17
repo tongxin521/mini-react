@@ -1,3 +1,4 @@
+import {Placement, Update, updateNode} from './../shared/util';
 function getParent(workInProgress) {
     // 获取父节点
     while(workInProgress) {
@@ -12,9 +13,14 @@ function getParent(workInProgress) {
 function commitNode(workInProgress) {
     // 提交节点
     const parentNodeDom = getParent(workInProgress.return);
-
-    if (workInProgress.stateNode) {
+    const {flags, stateNode} = workInProgress;
+    if (stateNode && flags & Placement) {
         parentNodeDom.appendChild(workInProgress.stateNode);
+    }
+
+    if (stateNode && flags & Update) {
+        // 这里就应该是更新属性的操作了
+        updateNode(stateNode, workInProgress.alternate.props, workInProgress.props);
     }
 }
 export default function commitWorker(workInProgress) {

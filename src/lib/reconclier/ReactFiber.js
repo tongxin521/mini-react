@@ -1,4 +1,4 @@
-import { Placement, isStr, isFn, isUndefined } from "../shared/util";
+import { Placement, isStrOrNumber, isFn, isUndefined } from "../shared/util";
 import {
     FunctionComponent,
     ClassComponent,
@@ -28,6 +28,8 @@ export default function createFiber(vnode, returnFiber) {
         index: null,
         // 存储旧的 fiber 对象
         alternate: null,
+        // 根据不同的 hook 类型，存储不同的数据
+        memorizedState: null,
     }
 
     const type = vnode.type;
@@ -36,7 +38,7 @@ export default function createFiber(vnode, returnFiber) {
     // 这个 tag 值是什么取决于 fiber 的 type 值
     // 不同的 vnode 类型，type 是有所不同的
 
-    if (isStr(type)) {
+    if (isStrOrNumber(type)) {
         fiber.tag = HostComponent;
     } else if (isFn(type)) {
         // 注意这里会有两种情况：函数组件和类组件的 type 都是 function

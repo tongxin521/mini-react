@@ -18,8 +18,8 @@ export const Deletion = 0b0000000000000000001000; // 8
  * @param {*} s
  * @returns
  */
-export function isStr(s) {
-  return typeof s === "string";
+export function isStrOrNumber(s) {
+  return typeof s === "string" || typeof s === "number";
 }
 
 /**
@@ -56,7 +56,7 @@ export function updateNode(node, preValue, nextValue) {
   // 2. 对新值的处理
   Object.keys(preValue).forEach((key) => {
     if (key === 'children') {
-      if (isStr(preValue[key])) {
+      if (isStrOrNumber(preValue[key])) {
         // 这里我们需要判断一下 children 是否是字符串
         // 如果是字符串，说明是文本节点，我们需要将其设置为空字符串
         node.textContent = '';
@@ -84,7 +84,7 @@ export function updateNode(node, preValue, nextValue) {
   Object.keys(nextValue).forEach((key) => {
     if (key === 'children') {
       // 文本节点
-      if (isStr(nextValue[key])) {
+      if (isStrOrNumber(nextValue[key])) {
         node.textContent = nextValue[key];
       } 
     }else if (key.startsWith('on')) {
@@ -95,8 +95,10 @@ export function updateNode(node, preValue, nextValue) {
       }
       node.addEventListener(eventName, nextValue[key]);
     } else {
-      // 普通属性
-        node[key] = nextValue[key];
+        // 普通属性
+        if (nextValue[key]) {
+          node[key] = nextValue[key];
+        }
     }
   })
 }
