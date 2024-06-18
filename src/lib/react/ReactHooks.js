@@ -98,7 +98,6 @@ export function useReducer(reducer, initialState) {
 }
 
 function dispatchReducerAction(fiber, hook, reducer, action) {
-    console.log('dispatchReducerAction', fiber, hook, reducer, action)
     // 更新 hook 对象的 memorizedState
     hook.memorizedState = reducer ? reducer(hook.memorizedState) : action;
     fiber.alternate = { ...fiber };

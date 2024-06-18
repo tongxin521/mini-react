@@ -98,9 +98,7 @@ export function updateNode(node, preValue, nextValue) {
       node.addEventListener(eventName, nextValue[key]);
     } else {
         // 普通属性
-        if (nextValue[key]) {
-          node[key] = nextValue[key];
-        }
+        node[key] = nextValue[key];
     }
   })
 }
