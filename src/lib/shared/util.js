@@ -60,7 +60,9 @@ export function updateNode(node, preValue, nextValue) {
         // 这里我们需要判断一下 children 是否是字符串
         // 如果是字符串，说明是文本节点，我们需要将其设置为空字符串
         node.textContent = '';
-      } else if (key.startsWith('on')) {
+      }
+    }
+    else if (key.startsWith('on')) {
         let eventName = key.slice(2).toLowerCase();
         // 需要注意，如果是 change 事件，那么背后绑定的是 input 事件
         // 这里我们需要做一下处理
@@ -69,7 +71,8 @@ export function updateNode(node, preValue, nextValue) {
         }
         // 移除事件
         node.removeEventListener(eventName, preValue[key]);
-      } else {
+    }
+    else {
         // 普通的属性
         // 例如 id、className 之类的
         // 这里不能无脑的直接去除，应该检查一下新值中是否还有这个属性
@@ -77,7 +80,6 @@ export function updateNode(node, preValue, nextValue) {
         if (!(key in nextValue)) {
           node[key] = '';
         }
-      }
     }
   })
 
@@ -111,4 +113,24 @@ export function updateNode(node, preValue, nextValue) {
  */
 export function getCurrentTime() {
   return performance.now();
+}
+
+/**
+ * 比较两个依赖项数组的每一项是否相同
+ * 如果都相同，返回 true，否则返回 false
+ * @param {*} nextDeps 新的依赖项数组
+ * @param {*} prevDeps 旧的依赖项数组
+ */
+export function areHookInputEqual(nextDeps, prevDeps) {
+  if (prevDeps === null) return false;
+  for (let i = 0; i < prevDeps.length && i < nextDeps.length; i++) {
+    // Object.is 是一个静态方法，用来严格比较两个值是否相同
+    if (Object.is(nextDeps[i], prevDeps[i])) {
+      continue;
+    }
+    // 只要有一项不相等，就返回 false
+    return false;
+  }
+  // 上面的整个循环都跑完了都没有返回 false，说明两个依赖项数组是相等的
+  return true;
 }

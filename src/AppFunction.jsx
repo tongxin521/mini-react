@@ -1,10 +1,28 @@
-import { useState } from "./lib/react/ReactHooks";
+import { useState, useReducer, useEffect } from "./lib/react/ReactHooks";
 // eslint-disable-next-line react/prop-types
 function AppFunction({id}) {
-  const [conter, setConter] = useState(0);
+  // 定义一个状态 count，以及修改状态的方法 setCount
+  const [count1, setCount1] = useState(0);
+  const [count2, setCount2] = useReducer((x) => x + 1, 0);
 
-  function addCounter() {
-    setConter(conter + 1);
+  useEffect(() => {
+    console.log("执行副作用方法1");
+    // 清理函数，会在下一次执行副作用函数之前执行
+    return function () {
+      console.log("执行了清理方法1");
+    };
+  }, [count1]);
+
+  useEffect(() => {
+    console.log("执行副作用方法2");
+    // 清理函数，会在下一次执行副作用函数之前执行
+    return function () {
+      console.log("执行了清理方法2");
+    };
+  }, [count2]);
+
+  function add () {
+    setCount2();
   }
 
   return (
@@ -21,9 +39,20 @@ function AppFunction({id}) {
       </div>
       <p>this is a tes1</p>
       <div>
-      <button onClick={addCounter}>+</button>
-        <span>{ conter }</span>
-        <button onClick={() => setConter(conter - 1)}>-</button>
+        <button onClick={() => setCount1(count1 - 1)}>-</button>
+        <span>
+          <span>状态值1：</span>
+          <span>{count1}</span>
+        </span>
+        <button onClick={() => setCount1(count1 + 1)}>+</button>
+      </div>
+      <div>
+        <button onClick={() => setCount2(count1 - 1)}>-</button>
+        <span>
+          <span>状态值2：</span>
+          <span>{count2}</span>
+        </span>
+        <button onClick={() => setCount2(count2 + 1)}>+</button>
       </div>
     </div>
   );

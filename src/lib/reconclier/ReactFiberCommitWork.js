@@ -1,4 +1,6 @@
 import {Placement, Update, updateNode} from './../shared/util';
+import {FunctionComponent} from './ReactWorkTag';
+import {invokeHooks} from './ReactChildFiberAssistant';
 function getParent(workInProgress) {
     // 获取父节点
     while(workInProgress) {
@@ -13,7 +15,7 @@ function getParent(workInProgress) {
 function commitNode(workInProgress) {
     // 提交节点
     const parentNodeDom = getParent(workInProgress.return);
-    const {flags, stateNode} = workInProgress;
+    const {flags, stateNode, tag} = workInProgress;
     if (stateNode && flags & Placement) {
         parentNodeDom.appendChild(workInProgress.stateNode);
     }
@@ -21,6 +23,11 @@ function commitNode(workInProgress) {
     if (stateNode && flags & Update) {
         // 这里就应该是更新属性的操作了
         updateNode(stateNode, workInProgress.alternate.props, workInProgress.props);
+    }
+
+    if (tag === FunctionComponent) {
+        // 处理hook
+        invokeHooks(workInProgress);
     }
 }
 export default function commitWorker(workInProgress) {

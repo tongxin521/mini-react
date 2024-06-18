@@ -3,6 +3,7 @@
  * 改文件用于创建各种 hooks
  */
 import scheduleUpdateOnFiber from './../reconclier/ReactFiberWokrLoop'
+import {areHookInputEqual} from './../shared/util'
 
 let currentlyRenderingFiber = null; // 当前渲染的 fiber 对象
 let workInProgressHook = null; // 当前正在处理的 hook
@@ -21,8 +22,6 @@ export function renderWithHooks(workInProgress) {
     workInProgressHook = null;
     //存储 effect 对应的副作用函数和依赖项
     currentlyRenderingFiber.updateQueue = [];
-
-    console.log('renderWithHooks', currentlyRenderingFiber);
 }
 
 /**
@@ -99,9 +98,49 @@ export function useReducer(reducer, initialState) {
 }
 
 function dispatchReducerAction(fiber, hook, reducer, action) {
+    console.log('dispatchReducerAction', fiber, hook, reducer, action)
     // 更新 hook 对象的 memorizedState
     hook.memorizedState = reducer ? reducer(hook.memorizedState) : action;
     fiber.alternate = { ...fiber };
     fiber.sibling = null;
     scheduleUpdateOnFiber(fiber);
+}
+
+/**
+ * 
+ * @param {*} create 副作用函数
+ * @param {*} deps 依赖项
+ */
+export function useEffect(create, deps) {
+    // 获取最后一个 hook
+    const hook = updateWorkInProgressHook();
+    // 用于存储销毁函数
+    let destroy = null;
+
+    if (currentHook) {
+        // 从 hook 中获取副作用函数和依赖项
+        const preEffect = currentHook.memorizedState;
+        // 上一次的销毁函数
+        destroy = preEffect.destroy;
+         // 判断是否有依赖项
+        if (deps) {
+            // 上一次的依赖项
+            const preDeps = preEffect.deps;
+            // 判断依赖项是否发生变化
+            if (areHookInputEqual(deps, preDeps)) {
+                // 说明依赖项没有变化，不需要执行副作用函数，直接返回
+                return;
+            }
+        }
+
+    }
+
+    // 组装要存储到 memorizedState 中的数据
+    const effect = {create, destroy, deps}
+
+    hook.memorizedState = effect;
+    // 接下来我们需要执行副作用函数
+    // 注意这里并非直接执行，推入到 updateQueue 数组中
+    currentlyRenderingFiber.updateQueue.push(effect);
+
 }

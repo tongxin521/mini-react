@@ -1,4 +1,5 @@
 import { Placement } from "../shared/util";
+import schedulerCallback from './../scheduler/scheduler';
 
 /**
  * 判断节点是否为相同
@@ -98,4 +99,22 @@ export function mapRemainingChildren(currentFirstChild) {
     }
 
     return existingChildren;
+}
+
+/**
+ * 一次执行 updateQueue 副作用函数
+ * @param {*} workInProgress 
+ */
+export function invokeHooks(workInProgress) {
+    const {updateQueue} = workInProgress;
+
+    for (let i = 0; i < updateQueue.length; ++i) {
+        const effect = updateQueue[i];
+        if (effect.destroy) {
+            effect.destroy();
+        }
+        schedulerCallback(function (){
+            effect.destroy = effect.create();
+        })
+    }
 }
