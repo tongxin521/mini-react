@@ -38,5 +38,4 @@
   - useReducer
   - useEffect
 
-大家下去可以根据自己的兴趣，自行深挖 react 源码，完善我们的这个 mini 版的 react。记住！兴趣最重要！！
 
