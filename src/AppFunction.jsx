@@ -21,10 +21,6 @@ function AppFunction({id}) {
     };
   }, [count2]);
 
-  function add () {
-    setCount2();
-  }
-
   return (
     <div className="container" id={id}>
       <div className="one">
